@@ -8,18 +8,21 @@ Gols :
 
 Basic Principal
 
- 
+![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/d1.png) 
 Diagram.1
 
 The rule is simple, we just send some (we’ll start with success outputs) events from NIFI to a running program, the latter will check the event content and verify to which Ingestion it’s belong, and what action to do.
 Let’s Start
 Here is of a common NIFI Dataflow Pipeline. Off Corse we generally have much more steps, but the actual presented principal will be the same.
- 
+
+![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/d2.png) 
 Diagram.2
 Nifi use the First processor to List a Database Tables, The Second one will Fetch the Data from each table, and the last one will Put results into HDFS.
 First Goals
 We’ll need to follow this demo Ingestion called “DEM01” into a centralized Dashboard, separating each Ingestion by an “ID”. The other ingestion are Real Production Ingestions 😊. The first column is the Functional Name, others are described in the title and will be explained later.
- 
+
+
+![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/d3.png) 
 Diagram.3
 
 In this stage or version of the Program, “we’ll focus on the number of succeeded ingested tables” to consider the status of the ingestion. Thus:
@@ -44,7 +47,9 @@ o	DBDM01/TB3 09h00m01s…
 o	DBDM01/TB1 10h00m00s…
 o	DBDM01/TB2 10h00m00s…
 o	DBDM01/TB3 10h00m02s…
- 
+
+
+![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/d4.png) 
 Diagram.4
 
 
@@ -58,7 +63,7 @@ And if you decide to display only the last status you will have to the last Inge
 
 # Solution Description Diagram
 
- 
+![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/d5.png)  
 Diagram.5
 1.	NIFI send results status to somewhere (Kafka) of the monitored steps (In our example the startup with the list database table and the end which is the putHDFS processor).
 For now, we'll focus only on SUCCES status (It is a good goal to stream all steps and Errors too, but this can be done into a second stage).
@@ -81,7 +86,8 @@ Here is another view for the same kinematic but showing efforts while adding the
 -	“Nifi efforts to perform by streaming events”
 -	Storing events 
 -	Processing events
- 
+
+![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/d5-5.png) 
 # How to Add events into NIFI
 
  
