@@ -97,7 +97,7 @@ The "SQLDONE" Update Attrbutes configuration is not used in the Release 1 of our
 The ReplaceText processor
  
 where replaementValue is equal to the following :
-{"Id":"${Id}","TableName":"${TableName}","Schedule":"${Schedule}","Velocity":"${Velocity}","Fname":"${Fname}","NifiTime":"${NifiTime}","NifiStartedTime":"${NifiStartedTime}","NifiStep":"${NifiStep}","FlowFileId":"${FlowFileId}","Volume":${Volume},"isStarted":${isStarted},"isLanded":${isLanded}}
+{"Id":"${Id}","TableName":"${TableName}","Schedule":"${Schedule}","Fname":"${Fname}","NifiTime":"${NifiTime}","NifiStartedTime":"${NifiStartedTime}","Volume":${Volume},"isStarted":${isStarted},"isLanded":${isLanded}}
 
 The Pubilsh Kafka processor depends on your Kafka version & configurations (secured or not, port ..etc).
 
@@ -114,13 +114,10 @@ Actual Code (To Attach)
 kafka_schema_Topic1 = StructType([
         StructField("Id", StringType(), True),
         StructField("TableName", StringType(), True),
-        StructField("FlowSpeedType", StringType(), True),
         StructField("NifiTime", TimestampType(), True),
         StructField("NifiStartedTime", TimestampType(), True),
         StructField("Schedule", StringType(), True),
         StructField("Fname", StringType(), True),
-        StructField("NifiStep", StringType(), True),
-        StructField("FlowFileId", StringType(), True),
         StructField("Volume", IntegerType(), True),
         StructField("isStarted", IntegerType(), True),
         StructField("isLanded", IntegerType(), True)
