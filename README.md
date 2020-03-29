@@ -17,6 +17,7 @@ Here is of a common NIFI Dataflow Pipeline. Off Corse we generally have much mor
 
 ![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/d2.png) 
 Diagram.2
+
 Nifi use the First processor to List a Database Tables, The Second one will Fetch the Data from each table, and the last one will Put results into HDFS.
 First Goals
 We’ll need to follow this demo Ingestion called “DEM01” into a centralized Dashboard, separating each Ingestion by an “ID”. The other ingestion are Real Production Ingestions 😊. The first column is the Functional Name, others are described in the title and will be explained later.
@@ -32,7 +33,9 @@ In this stage or version of the Program, “we’ll focus on the number of succe
 -	If a special case happens as we see in the Panel (this can happen if a bad restart of NIFI was done or somebody cleared manually flow files into NIFI the “Need attention” status is displayed.
 Remark : The code will only send numeric exit Status and the colors are managed into Grafana.
 Challenge and Solution Concept
-The main problem is that ingestions solutions are not aware about what can be called as “a new ingestion” comparing to another one … each time a scheduled task is done, nifi will realize the action without saying “ah it’s new ingestion phase”. But how to separate old events (flow files) entry into nifi from new one’s ?  A very complicated DATES exercises can be very stressful. 
+T
+he main problem is that ingestions solutions are not aware about what can be called as “a new ingestion” comparing to another one … each time a scheduled task is done, nifi will realize the action without saying “ah it’s new ingestion phase”. But how to separate old events (flow files) entry into nifi from new one’s ?  A very complicated DATES exercises can be very stressful. 
+
 Luckily, Structured Spark Streaming group natively data events by specific criteria (w’ll use startup dates for that).
 Imagine each Database Ingestion as a Trip, each table as a Passenger. If you restart the same ingestion several times, how is it possible to dissociate the same passenger from different Trips ?
 
@@ -41,6 +44,7 @@ The solution is to group all passengers by “Departures Window Time Frame”.
 Let’s says DBDEM01 have 3 tables TB1, TB2 and DB3.
 If I start the ingestion of DBDEMO 2, 3 or more times during the same day, Let’s say at 09:00 and 10:00 , well just force Nifi to send each event to Spark (via kafka), and tell to Spark to reorganize events  :
 -	List Database send Events : 
+
 o	DBDM01/TB1 09h00m00s…
 o	DBDM01/TB2 09h00m00s…
 o	DBDM01/TB3 09h00m01s…     
@@ -65,6 +69,7 @@ And if you decide to display only the last status you will have to the last Inge
 
 ![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/d5.png)  
 Diagram.5
+
 1.	NIFI send results status to somewhere (Kafka) of the monitored steps (In our example the startup with the list database table and the end which is the putHDFS processor).
 For now, we'll focus only on SUCCES status (It is a good goal to stream all steps and Errors too, but this can be done into a second stage).
 2.	We chare the SLA table into a different Kafka Topic, which will be used to define for each Ingestion ID what are the conditions of success, and the what is the Time to consider that an ingestion has reached the maximum acceptable time. This is a functional decision to take with the business (after considering the technical prerequisites, an advice : negotiate for the maximum acceptable time window).  A nifi dedicated data flow can be used for that (do not stress your Database consuming each 5mn is enough while those info are manually updated each time a new ingestion is created to be monitored).
