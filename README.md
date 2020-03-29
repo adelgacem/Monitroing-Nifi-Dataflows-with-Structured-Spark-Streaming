@@ -45,17 +45,17 @@ Let’s says DBDEM01 have 3 tables TB1, TB2 and DB3.
 If I start the ingestion of DBDEMO 2, 3 or more times during the same day, Let’s say at 09:00 and 10:00 , well just force Nifi to send each event to Spark (via kafka), and tell to Spark to reorganize events  :
 -	List Database send Events : 
 
-o	DBDM01/TB1 09h00m00s…
-o	DBDM01/TB2 09h00m00s…
-o	DBDM01/TB3 09h00m01s…     
-o	DBDM01/TB1 10h00m00s…
-o	DBDM01/TB2 10h00m00s…
-o	DBDM01/TB3 10h00m02s…
+DBDM01/TB1 09h00m00s…
+DBDM01/TB2 09h00m00s…
+DBDM01/TB3 09h00m01s…
+DBDM01/TB1 10h00m00s…
+DBDM01/TB2 10h00m00s…
+DBDM01/TB3 10h00m02s…
 
 
 ![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/d4.png) 
-Diagram.4
 
+Diagram.4
 
 When we’ll check into Arrivals states, we’ll ask to Spark to regroup those events(passengers) By Startup Frames. This will facilitate the work to count passengers by Trip or Flight ID, and decide with status to give into the monitoring dashboard.
 Spark will group two trips by their “ID” and Startup window time frame (we decided that 2mn is enough to say same ingestions (same ID) cannot start during less than 2mn two times).
@@ -68,18 +68,14 @@ And if you decide to display only the last status you will have to the last Inge
 # Solution Description Diagram
 
 ![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/d5.png)  
+
 Diagram.5
 
 1.	NIFI send results status to somewhere (Kafka) of the monitored steps (In our example the startup with the list database table and the end which is the putHDFS processor).
 For now, we'll focus only on SUCCES status (It is a good goal to stream all steps and Errors too, but this can be done into a second stage).
 2.	We chare the SLA table into a different Kafka Topic, which will be used to define for each Ingestion ID what are the conditions of success, and the what is the Time to consider that an ingestion has reached the maximum acceptable time. This is a functional decision to take with the business (after considering the technical prerequisites, an advice : negotiate for the maximum acceptable time window).  A nifi dedicated data flow can be used for that (do not stress your Database consuming each 5mn is enough while those info are manually updated each time a new ingestion is created to be monitored).
-3.	The code (Spark Structured Streaming) will process each Event to 
-1.	Update the status step of the ingestion(s). 
-1.	Started 
-2.	Running  
-3.	Landed 
-4.	Need Attention (Error or other cases).
-2.	Determine if the ingestion is On Time or Delayed by comparing the duration Time and the SLA described into the SLA Reference Table.
+3.	The code (Spark Structured Streaming) will process each Event to Update the status step of the ingestion(s) :
+   (Started, Running, Landed, Need Attention (Error or other cases)), and determine if the ingestion is "On Time" or "Delayed" by comparing the duration Time and the SLA described into the SLA Reference Table.
 
 4.	The code will publish the results and store them (into another output Kafka Topic)
 5.	Another NIFI dataflow read from the output Topic to update results into ElasticSearch (we could go directly from Spark but it’s simpler to isolate and respect a microservices approach while we have already NIFI let’s use it’s simplicity to the this tasks, this will help in the furtur to maintain the code and in case of troubleshooting it’s much more easier).
