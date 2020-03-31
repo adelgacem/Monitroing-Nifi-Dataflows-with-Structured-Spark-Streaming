@@ -113,9 +113,9 @@ Now that we do have NIFI status events into Kafka Topic 1, what to do with those
 
  
 
-# Structured Spark Streaming Code
+# Structured Spark Streaming Code description
 1.	Conditions 
-1.	In this simple code, we consider that an ingestion can run several times a day but not under 5mn. This is the minimum Window Time where the same ingestion doesn't have to start twice.
+1.	In this simple code :), we consider that an ingestion can run several times a day but not to times in a time window less than 2mn. This is the minimum Window Time where the same ingestion doesn't have to start twice.
 2.	Each End to End Ingestion (List database until put HDFS) need to spend more than 1 minute.  
 3.	if (a) and (b) conditions are not respected you will need to change the Window frequency into the code (condition (a)) and changeg the time limite defining the status  (condition b))
 Actual Code (To Attach)
@@ -133,14 +133,11 @@ kafka_schema_Topic1 = StructType([
 
 # Production Validation 
 
-	Memory Usage : As wetermarking is in place, old events are filtred (see image bellow)
+* Memory Usage : As wetermarking is in place, old events are filtred (see image bellow)
 Watermarking capture from one Dataflow event :
  
 
-# Details for change deployment,
-•	Put Els
-
+* ElasticSearch Best Practises are to respect and out of the scope. 
 # Monitor your code 
 - Restart it in case of crash when using OOZIE or another scheduler to restart the code if needed.
   You can check simply with monitor activiry from NIFI and post to another Kafka Topic to KILL and Restart the actual runinng code, but this is out of the scope and is more related to monitoring streaming applications.
-
