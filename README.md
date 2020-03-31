@@ -91,7 +91,7 @@ Here is another view for the same kinematic but showing efforts while adding the
 ![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/d5-5.png) 
 # How to Add events into NIFI
 
- 
+![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/d6.png) 
 Diagram.6
 
 The "STARTED" Update Attributes configuration
@@ -104,7 +104,8 @@ The "SQLDONE" Update Attrbutes configuration is not used in the Release 1 of our
 The ReplaceText processor
  
 where replaementValue is equal to the following :
-{"Id":"${Id}","TableName":"${TableName}","Schedule":"${Schedule}","Fname":"${Fname}","NifiTime":"${NifiTime}","NifiStartedTime":"${NifiStartedTime}","Volume":${Volume},"isStarted":${isStarted},"isLanded":${isLanded}}
+
+{"Id":"${Id}","Fname":"${SIA}","NifiTime":"${now():format("yyyy-MM-dd HH:mm:ss")}","NifiStartedTime":"${NifiStartedTime}","Volume":${file_size},"isStarted":${isStarted},"isLanded":${isLanded},"Maxitime":${EXPIRED_TIME},"FlagPath":"${PATH_HDFS_FLAG}"}
 
 The Pubilsh Kafka processor depends on your Kafka version & configurations (secured or not, port ..etc).
 
@@ -119,16 +120,16 @@ Now that we do have NIFI status events into Kafka Topic 1, what to do with those
 3.	if (a) and (b) conditions are not respected you will need to change the Window frequency into the code (condition (a)) and changeg the time limite defining the status  (condition b))
 Actual Code (To Attach)
 kafka_schema_Topic1 = StructType([
-        StructField("Id", StringType(), True),
-        StructField("TableName", StringType(), True),
-        StructField("NifiTime", TimestampType(), True),
-        StructField("NifiStartedTime", TimestampType(), True),
-        StructField("Schedule", StringType(), True),
-        StructField("Fname", StringType(), True),
-        StructField("Volume", IntegerType(), True),
-        StructField("isStarted", IntegerType(), True),
-        StructField("isLanded", IntegerType(), True)
-])
+	StructField("Id", StringType(), True),
+	StructField("NifiTime", TimestampType(), True),
+	StructField("NifiStartedTime", TimestampType(), True),
+	StructField("Fname", StringType(), True),
+	StructField("Volume", LongType(), True),
+	StructField("isStarted", IntegerType(), True),
+	StructField("isLanded", IntegerType(), True),
+	StructField("Maxitime", IntegerType(), True),
+	StructField("FlagPath", StringType(), True)
+	])
 
 # Production Validation 
 
