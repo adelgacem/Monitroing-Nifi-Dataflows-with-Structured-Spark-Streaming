@@ -124,6 +124,7 @@ Now that we do have NIFI status events into Kafka Topic 1, what to do with those
 2.	Each End to End Ingestion (List database until put HDFS) need to spend more than 1 minute.  
 3.	if (a) and (b) conditions are not respected you will need to change the Window frequency into the code (condition (a)) and changeg the time limite defining the status  (condition b))
 Actual Code (To Attach)
+
 kafka_schema_Topic1 = StructType([
 	StructField("Id", StringType(), True),
 	StructField("NifiTime", TimestampType(), True),
