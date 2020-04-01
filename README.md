@@ -95,9 +95,9 @@ Here is another view for the same kinematic but showing efforts while adding the
 Diagram.6
 
 The "STARTED" Update Attributes configuration
- 
+![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/update_started.png) 
 The "Landed" Update Attributes configuration
- 
+![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/update_running.png) 
 
 The "SQLDONE" Update Attrbutes configuration is not used in the Release 1 of our program.
 
@@ -105,7 +105,7 @@ The ReplaceText processor
  
 where replaementValue is equal to the following :
 
-{"Id":"${Id}","Fname":"${SIA}","NifiTime":"${now():format("yyyy-MM-dd HH:mm:ss")}","NifiStartedTime":"${NifiStartedTime}","Volume":${file_size},"isStarted":${isStarted},"isLanded":${isLanded},"Maxitime":${EXPIRED_TIME},"FlagPath":"${PATH_HDFS_FLAG}"}
+{"Id":"${Id}","NifiTime":"${now():format("yyyy-MM-dd HH:mm:ss")}","NifiStartedTime":"${NifiStartedTime}","Fname":"${Fname}","Volume":${Volume},"isStarted":${isStarted},"isLanded":${isLanded},"Maxitime":${EXPIRED_TIME},"FlagPath":"${PATH_HDFS_FLAG}"}
 
 The Pubilsh Kafka processor depends on your Kafka version & configurations (secured or not, port ..etc).
 
