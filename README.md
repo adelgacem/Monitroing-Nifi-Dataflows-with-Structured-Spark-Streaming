@@ -11,25 +11,25 @@ Basic Principal
 ![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/d1.png) 
 Diagram.1
 
-The rule is simple, we just send some (we’ll start with success outputs) events from NIFI to a running program, the latter will check the event content and verify to which Ingestion it’s belong, and what action to do.
-Let’s Start
-Here is of a common NIFI Dataflow Pipeline. Off Corse we generally have much more steps, but the actual presented principal will be the same.
+The rule is simple :), we just send some events from NIFI (we’ll start with success outputs) to a running program, the latter will check the event content and verify to which Ingestion it’s belong, and what action to do.
+Let’s Start :
+Here is a common NIFI Dataflow Pipeline. Off Corse we generally have much more steps, but the presented principal will be the same.
 
 ![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/d2.png) 
 Diagram.2
 
 Nifi use the First processor to List a Database Tables, The Second one will Fetch the Data from each table, and the last one will Put results into HDFS.
 First Goals
-We’ll need to follow this demo Ingestion called “DEM01” into a centralized Dashboard, separating each Ingestion by an “ID”. The other ingestion are Real Production Ingestions 😊. The first column is the Functional Name, others are described in the title and will be explained later.
+We’ll need to follow this demo Ingestion called “DEM01” into a centralized Dashboard, separating Ingestions by a specific identifier called “ID”. The other ingestion hiden are Real Production Ingestions 😊. The first column is the Functional Name, others are described in the title and will be explained later.
 
 
 ![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/d3.png) 
 Diagram.3
 
-In this stage or version of the Program, “we’ll focus on the number of succeeded ingested tables” to consider the status of the ingestion. Thus:
+In this stage or version of the Program, “we’ll focus on the number of succeeded ingested tables” to determine the right status of the ingestion. Thus:
 -	If the Number of arrived tables (Noted as “Arrived” in the last panel and calculated by the Put-HDFS success events) is equal to “Tables Number” calculated by the List-Table success events) we consider that the ingestion is done (Landed).
--	If the “Arrived” (Put HDFS) number is higher than what was expected, the Ingestion status will stay as “Running” and ;
--	In both cases if the SLA defined Time is not reached, the velocity it will be noted as “OnTime”, otherwise its considered as “Delayed” (we can define more conditions later to consider an ingestion as Failed by routing errors too from NIFI but this will be done in V2 of the program).
+-	If the “Arrived” (Put HDFS) number is higher than what is expected, the Ingestion status will stay as “Running” and ;
+-	In both cases if the SLA (defined acceptable time) is not reached, the velocity it will be noted as “OnTime”, otherwise its considered as “Delayed” ingestion (we can define more conditions later to consider an ingestion as Failed by routing errors, musuring volumes delta ..etc but this will be done in the second stage of the program).
 -	If a special case happens as we see in the Panel (this can happen if a bad restart of NIFI was done or somebody cleared manually flow files into NIFI the “Need attention” status is displayed.
 Remark : The code will only send numeric exit Status and the colors are managed into Grafana.
 Challenge and Solution Concept
