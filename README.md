@@ -110,6 +110,9 @@ The ReplaceText processor
  
 where replaementValue is equal to the following :
 
+![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/replacetext.png) 
+
+
 {"Id":"${Id}","NifiTime":"${now():format("yyyy-MM-dd HH:mm:ss")}","NifiStartedTime":"${NifiStartedTime}","Fname":"${Fname}","Volume":${Volume},"isStarted":${isStarted},"isLanded":${isLanded},"Maxitime":${Maxitime},"FlagPath":"${FlagPath}"}
 
 The Pubilsh Kafka processor depends on your Kafka version & configurations (secured or not, port ..etc).
@@ -147,3 +150,6 @@ Watermarking capture from one Dataflow event :
 # Monitor your code 
 - Restart it in case of crash when using OOZIE or another scheduler to restart the code if needed.
   You can check simply with monitor activiry from NIFI and post to another Kafka Topic to KILL and Restart the actual runinng code, but this is out of the scope and is more related to monitoring streaming applications.
+
+
+# how to execute your code
