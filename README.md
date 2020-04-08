@@ -155,4 +155,4 @@ Watermarking capture from one Dataflow event :
 # how to execute your code
 you need to add in your spark-submit
 
---jars spark-streaming-kafka-0-8_2.11-2.3.0.2.6.5.0-292.jar,spark-streaming-kafka-0-8-assembly_2.11-2.3.0.2.6.5.0-292.jar,spark-sql-kafka-0-10_2.11-2.3.0.2.6.5.0-292.jar,hdfs://bighdpope/JARY/kafka-clients-0.10.2.2.jar
+--jars spark-streaming-kafka-0-8_2.11-2.3.0.2.6.5.0-292.jar,spark-streaming-kafka-0-8-assembly_2.11-2.3.0.2.6.5.0-292.jar,spark-sql-kafka-0-10_2.11-2.3.0.2.6.5.0-292.jar,hdfs://Your_HDFS_PATH/JARY/kafka-clients-0.10.2.2.jar
