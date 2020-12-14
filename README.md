@@ -1,6 +1,6 @@
 # Monitroing Nifi Dataflows with Structured Spark Streaming
 
-Gols :
+Goals :
 
 1.	Visual Application Ingestion Monitoring
 2.	Application SLA Integration
