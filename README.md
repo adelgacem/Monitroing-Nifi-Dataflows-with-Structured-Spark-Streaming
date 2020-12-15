@@ -11,32 +11,33 @@ Basic Principal
 ![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/d1.png) 
 Diagram.1
 
-The rule is simple :), we just send some events from NIFI (we’ll start with success outputs) to a running program, the latter will check the event content and verify to which Ingestion it’s belong, and what action to do.
+The rule is simple :), we need first to send events from NIFI to Kafka (we’ll start with success outputs from PutHdfs), The running application will check the Event contents and verify to which Ingestion it’s belong, and which Ingestion Timestamp its belong too and update the ingestion status.
 Let’s Start :
 Here is a common NIFI Dataflow Pipeline. Off Corse we generally have much more steps, but the presented principal will be the same.
 
 ![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/d2.png) 
 Diagram.2
 
-Nifi use the First processor to List a Database Tables, The Second one will Fetch the Data from each table, and the last one will Put results into HDFS.
+The 1rst Nifi processor will list a Database Tables, The Second will Fetch the Data from each table, and the last one will Put results into HDFS.
+Other more complicated patterns can be also treated with the same approache, but we'll start whith simple case.
 First Goals
-We’ll need to follow this demo Ingestion called “DEM01” into a centralized Dashboard, separating Ingestions by a specific identifier called “ID”. The other ingestion hiden are Real Production Ingestions 😊. The first column is the Functional Name, others are described in the title and will be explained later.
+We’ll need to follow the status of the Ingestion called “DEM01” into a centralized Dashboard, separating Ingestions by a specific identifier called “ID”. The first column is the Functional Name, others are described in the title and will be explained later.
 
 
 ![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/d3.png) 
 Diagram.3
 
 In this stage or version of the Program, “we’ll focus on the number of succeeded ingested tables” to determine the right status of the ingestion. Thus:
--	If the Number of arrived tables (Noted as “Arrived” in the last panel and calculated by the Put-HDFS success events) is equal to “Tables Number” calculated by the List-Table success events) we consider that the ingestion is done (Landed).
+-	If the Number of arrived tables (Noted as “Arrived” in the last panel) is equal to “Tables Number” (calculated by the List-Table success events) we consider the ingestion steps are done (Landed). 
 -	If the “Arrived” (Put HDFS) number is higher than what is expected, the Ingestion status will stay as “Running” and ;
--	In both cases if the SLA (defined acceptable time) is not reached, the velocity it will be noted as “OnTime”, otherwise its considered as “Delayed” ingestion (we can define more conditions later to consider an ingestion as Failed by routing errors, musuring volumes delta ..etc but this will be done in the second stage of the program).
--	If a special case happens as we see in the Panel (this can happen if a bad restart of NIFI was done or somebody cleared manually flow files into NIFI the “Need attention” status is displayed.
+-	In both cases if the SLA (defined acceptable time) is not reached, the velocity it will be noted as “OnTime”, otherwise its considered as “Delayed” ingestion (we can define more conditions later to consider an ingestion as Failed by routing errors, musuring volumes variations ..etc but this will be done in the second stage of the program).
+-	If a special case happens as we see in the Panel (this can happen if Nifi craches or manually clear flow files into NIFI) the “Need attention” status is displayed.
+
 Remark : The code will only send numeric exit Status and the colors are managed into Grafana.
 Challenge and Solution Concept
-T
-he main problem is that ingestions solutions are not aware about what can be called as “a new ingestion” comparing to another one … each time a scheduled task is done, nifi will realize the action without saying “ah it’s new ingestion phase”. But how to separate old events (flow files) entry into nifi from new one’s ?  A very complicated DATES exercises can be very stressful. 
+The main problem is that ingestions solutions are not aware about what can be called as “a new ingestion” comparing to another one … each time a scheduled task is done, nifi will realize the action without saying “ah it’s new ingestion phase”. But how to separate old events (flow files) entry into nifi from new one’s ?  A very complicated DATES exercises can be very stressful. 
 
-Luckily, Structured Spark Streaming group natively data events by specific criteria (w’ll use startup dates for that).
+Luckily, Structured Spark Streaming group natively data events by specific criteria (w’ll use The Nifi Start dates for that).
 Imagine each Database Ingestion as a Trip, each table as a Passenger. If you restart the same ingestion several times, how is it possible to dissociate the same passenger from different Trips ?
 
 The solution is to group all passengers by “Departures Window Time Frame”.
