@@ -11,7 +11,8 @@ Basic Principal
 ![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/d1.png) 
 Diagram.1
 
-The rule is simple :), we need first to send events from NIFI to Kafka (we’ll start with success outputs from PutHdfs), The running application will check the Event contents and verify to which Ingestion it’s belong, and which Ingestion Timestamp its belong too and update the ingestion status.
+The rule is simple :), we have to send events from NIFI to Kafka (we’ll start with success outputs from PutHdfs), the running application will check the Event-contents and verify to which Ingestion it’s belong, and will update the ingestion status. That's all.
+
 Let’s Start :
 Here is a common NIFI Dataflow Pipeline. Off Corse we generally have much more steps, but the presented principal will be the same.
 
@@ -19,7 +20,7 @@ Here is a common NIFI Dataflow Pipeline. Off Corse we generally have much more s
 Diagram.2
 
 The 1rst Nifi processor will list a Database Tables, The Second will Fetch the Data from each table, and the last one will Put results into HDFS.
-Other more complicated patterns can be also treated with the same approache, but we'll start whith simple case.
+Other more complicated patterns can be also treated with the same approache, but we'll start whith this simple case.
 First Goals
 We’ll need to follow the status of the Ingestion called “DEM01” into a centralized Dashboard, separating Ingestions by a specific identifier called “ID”. The first column is the Functional Name, others are described in the title and will be explained later.
 
@@ -27,24 +28,23 @@ We’ll need to follow the status of the Ingestion called “DEM01” into a cen
 ![alt tag](https://github.com/adelgacem/Monitroing-Nifi-Dataflows-with-Structured-Spark-Streaming/blob/master/image/d3.png) 
 Diagram.3
 
-In this stage or version of the Program, “we’ll focus on the number of succeeded ingested tables” to determine the right status of the ingestion. Thus:
--	If the Number of arrived tables (Noted as “Arrived” in the last panel) is equal to “Tables Number” (calculated by the List-Table success events) we consider the ingestion steps are done (Landed). 
--	If the “Arrived” (Put HDFS) number is higher than what is expected, the Ingestion status will stay as “Running” and ;
--	In both cases if the SLA (defined acceptable time) is not reached, the velocity it will be noted as “OnTime”, otherwise its considered as “Delayed” ingestion (we can define more conditions later to consider an ingestion as Failed by routing errors, musuring volumes variations ..etc but this will be done in the second stage of the program).
+In this stage or version of the Program, “we’ll focus on the number of succeeded ingested tables” to determine the status of the ingestion. Thus:
+-	If the Number of arrived tables is equal to “Tables Number” (total of succedded copies which belong to the same started ingestion) we can consider the ingestion steps are done (Landed). 
+-	If the SLA (defined acceptable time) is not reached, the velocity it will be noted as “OnTime”, otherwise its considered as “Delayed” ingestion (we can define more conditions later to consider an ingestion as Failed by routing errors, musuring volumes variations ..etc but this will be done in the second stage of the program).
 -	If a special case happens as we see in the Panel (this can happen if Nifi craches or manually clear flow files into NIFI) the “Need attention” status is displayed.
 
 Remark : The code will only send numeric exit Status and the colors are managed into Grafana.
 Challenge and Solution Concept
-The main problem is that ingestions solutions are not aware about what can be called as “a new ingestion” comparing to another one … each time a scheduled task is done, nifi will realize the action without saying “ah it’s new ingestion phase”. But how to separate old events (flow files) entry into nifi from new one’s ?  A very complicated DATES exercises can be very stressful. 
+The main problem is that ingestions solutions are not aware about what can be called as “a new ingestion” comparing to another one … each time a scheduled task is done, nifi will realize the transfert without saying “ah it’s new ingestion phase”. But how can we separate old events (flow files) entry from new one’s ?  A very complicated DATES exercises can be very stressful...
 
 Luckily, Structured Spark Streaming group natively data events by specific criteria (w’ll use The Nifi Start dates for that).
-Imagine each Database Ingestion as a Trip, each table as a Passenger. If you restart the same ingestion several times, how is it possible to dissociate the same passenger from different Trips ?
+Imagine each Database Ingestion as a Trip and each table as a Passenger. If you restart the same ingestion several times, how is it possible to dissociate the same passenger from different Trips ?
 
 The solution is to group all passengers by “Departures Window Time Frame”.
 
 Let’s says DBDEM01 have 3 tables TB1, TB2 and DB3.
-If I start the ingestion of DBDEMO 2, 3 or more times during the same day, Let’s say at 09:00 and 10:00 , well just force Nifi to send each event to Spark (via kafka), and tell to Spark to reorganize events  :
--	List Database send Events : 
+If I start the ingestion of DBDEMO 2, 3 or more times during the same day, Let’s say at 09:00 and 10:00 , well just force Nifi to send each event (via kafka), and tell to Spark to reorganize events  :
+-	List Database will send those Events : 
 
 DBDM01/TB1 09h00m00s…
 DBDM01/TB2 09h00m00s…
@@ -58,7 +58,7 @@ DBDM01/TB3 10h00m02s…
 
 Diagram.4
 
-When we’ll check into Arrivals states, we’ll ask to Spark to regroup those events(passengers) By Startup Frames. This will facilitate the work to count passengers by Trip or Flight ID, and decide with status to give into the monitoring dashboard.
+When we’ll check into the Arrivals states, we’ll ask to Spark to group those events(passengers) By Startup Frames. This will facilitate the work to count passengers by Trip or Flight ID, and decide which status to display into the monitoring dashboard.
 Spark will group two trips by their “ID” and Startup window time frame (we decided that 2mn is enough to say same ingestions (same ID) cannot start during less than 2mn two times).
 For the given example the result will be the following
 Functional Name	ID	Departure Time	Nb of Discovered Tables (Passengers)	Ingested Volume	Nb of Ingested Tables (arrived passengers)	SLA (Time defined as acceptable to wait)	Actual Velocity TAG	Status	Arrived Time (all tables so finish Time)
